@@ -51,7 +51,7 @@ public class Scanner {
         return current >= source.length();
     }
 
-    public boolean scanToken() {
+    public void scanToken() {
         char c = advance();
         switch (c) {
             case '(':
@@ -124,7 +124,6 @@ public class Scanner {
                 }
                 break;
         }
-        return false;
     }
 
     private char advance() {

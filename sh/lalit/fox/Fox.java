@@ -7,6 +7,7 @@ import java.nio.Buffer;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
 
 public class Fox {
     public static boolean hadError = false;
@@ -46,7 +47,7 @@ public class Fox {
 
     private static void run(String src) {
         Scanner scanner = new Scanner(src);
-        List tokens = scanner.scanToken();
+        List<Token> tokens = scanner.scanTokens();
         for (Token token : tokens) {
             System.out.println(token);
         }

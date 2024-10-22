@@ -1,4 +1,4 @@
-package Token;
+package sh.lalit.fox;
 
 public class Token {
     final TokenType type;

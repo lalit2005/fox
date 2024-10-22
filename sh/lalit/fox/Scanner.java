@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 
+import sh.lalit.fox.TokenType;
+
 public class Scanner {
     private final String source;
     private final List<Token> tokens = new ArrayList<Token>();
@@ -17,20 +19,20 @@ public class Scanner {
         keywords = new HashMap<>();
         keywords.put("and", TokenType.AND);
         keywords.put("class", TokenType.CLASS);
-        keywords.put("else", TokenType.CLASS);
-        keywords.put("false", TokenType.CLASS);
-        keywords.put("for", TokenType.CLASS);
-        keywords.put("fun", TokenType.CLASS);
-        keywords.put("if", TokenType.CLASS);
-        keywords.put("nil", TokenType.CLASS);
-        keywords.put("or", TokenType.CLASS);
-        keywords.put("print", TokenType.CLASS);
-        keywords.put("return", TokenType.CLASS);
-        keywords.put("super", TokenType.CLASS);
-        keywords.put("this", TokenType.CLASS);
-        keywords.put("true", TokenType.CLASS);
-        keywords.put("while", TokenType.CLASS);
-        keywords.put("var", TokenType.CLASS);
+        keywords.put("else", TokenType.ELSE);
+        keywords.put("false", TokenType.FALSE);
+        keywords.put("for", TokenType.FOR);
+        keywords.put("fun", TokenType.FUN);
+        keywords.put("if", TokenType.IF);
+        keywords.put("nil", TokenType.NIL);
+        keywords.put("or", TokenType.OR);
+        keywords.put("print", TokenType.PRINT);
+        keywords.put("return", TokenType.RETURN);
+        keywords.put("super", TokenType.SUPER);
+        keywords.put("this", TokenType.THIS);
+        keywords.put("true", TokenType.TRUE);
+        keywords.put("while", TokenType.WHILE);
+        keywords.put("var", TokenType.VAR);
     }
 
     public Scanner(String source) {
@@ -70,19 +72,19 @@ public class Scanner {
                 addToken(TokenType.COMMA);
                 break;
             case '.':
-                addToken(TokenType.LEFT_PAREN);
+                addToken(TokenType.DOT);
                 break;
             case '-':
-                addToken(TokenType.LEFT_PAREN);
+                addToken(TokenType.MINUS);
                 break;
             case '+':
-                addToken(TokenType.LEFT_PAREN);
+                addToken(TokenType.PLUS);
                 break;
             case ';':
-                addToken(TokenType.LEFT_PAREN);
+                addToken(TokenType.SEMICOLON);
                 break;
             case '*':
-                addToken(TokenType.LEFT_PAREN);
+                addToken(TokenType.STAR);
                 break;
             case '!':
                 addToken(match('=') ? TokenType.BANG_EQUAL : TokenType.BANG);

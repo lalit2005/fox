@@ -17,11 +17,10 @@ public class Parser {
 
     public Expr parse() {
         try {
-            expression();
+            return expression();
         } catch (ParseError error) {
             return null;
         }
-        return null;
     }
 
     private Expr expression() {

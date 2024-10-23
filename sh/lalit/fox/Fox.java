@@ -1,6 +1,6 @@
 package sh.lalit.fox;
 
-import static sh.lalit.fox.TokenType.EOF;
+import static sh.lalit.fox.TokenType.*;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -51,6 +51,10 @@ public class Fox {
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
+        if (expression == null) {
+            System.out.println("Expression is null");
+            return;
+        }
         if (hadError)
             return;
         System.out.println(new AstPrinter().print(expression));

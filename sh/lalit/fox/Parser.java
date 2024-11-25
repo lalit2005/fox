@@ -5,8 +5,7 @@ import static sh.lalit.fox.TokenType.*;
 import java.util.List;
 
 public class Parser {
-    private static class ParseError extends RuntimeException {
-    }
+    private static class ParseError extends RuntimeException {}
 
     private final List<Token> tokens;
     private int current = 0;

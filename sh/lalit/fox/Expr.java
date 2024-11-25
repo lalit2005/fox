@@ -1,7 +1,5 @@
 package sh.lalit.fox;
 
-import java.util.List;
-
 abstract class Expr {
   interface Visitor<R> {
     R visitBinaryExpr(Binary expr);
@@ -57,9 +55,9 @@ abstract class Expr {
   }
 
   static class Unary extends Expr {
-    Unary(Token operator, Expr left) {
+    Unary(Token operator, Expr right) {
       this.operator = operator;
-      this.left = left;
+      this.right = right;
     }
 
     @Override
@@ -68,7 +66,7 @@ abstract class Expr {
     }
 
     final Token operator;
-    final Expr left;
+    final Expr right;
   }
 
   abstract <R> R accept(Visitor<R> visitor);

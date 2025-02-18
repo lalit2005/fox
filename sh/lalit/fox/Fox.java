@@ -57,13 +57,8 @@ public class Fox {
         List<Token> tokens = scanner.scanTokens();
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
-        // if (expression == null) {
-        // System.out.println("Expression is null");
-        // return;
-        // }
         if (hadError)
             return;
-        // System.out.println(new AstPrinter().print(expression));
         interpreter.interpret(statements);
     }
 

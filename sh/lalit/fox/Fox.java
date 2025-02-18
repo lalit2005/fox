@@ -11,68 +11,82 @@ import java.nio.file.Paths;
 import java.util.List;
 
 public class Fox {
-  public static boolean hadError = false;
 
-  public static void main(String[] args) throws IOException {
-    if (args.length > 1) {
-      System.out.println("Usage: fox [script]");
-      System.exit(64);
-    } else if (args.length == 1) {
-      runFile(args[0]);
-    } else {
-      runPrompt();
+    private static final Interpreter interpreter = new Interpreter();
+    public static boolean hadError = false;
+    public static boolean hadRuntimeError = false;
+
+    public static void main(String[] args) throws IOException {
+        if (args.length > 1) {
+            System.out.println("Usage: fox [script]");
+            System.exit(64);
+        } else if (args.length == 1) {
+            runFile(args[0]);
+        } else {
+            runPrompt();
+        }
     }
-  }
 
-  private static void runFile(String path) throws IOException {
-    byte[] bytes = Files.readAllBytes(Paths.get(path));
-    run(new String(bytes, Charset.defaultCharset()));
-    if (hadError) {
-      System.exit(65);
+    private static void runFile(String path) throws IOException {
+        byte[] bytes = Files.readAllBytes(Paths.get(path));
+        run(new String(bytes, Charset.defaultCharset()));
+        if (hadError)
+            System.exit(65);
+        if (hadRuntimeError)
+            System.exit(70);
     }
-  }
 
-  private static void runPrompt() throws IOException {
-    InputStreamReader input = new InputStreamReader(System.in);
-    BufferedReader reader = new BufferedReader(input);
-    for (; ; ) {
-      System.out.print("> ");
-      String line = reader.readLine();
-      if (line == null) {
-        break;
-      }
-      run(line);
-      hadError = false;
+    private static void runPrompt() throws IOException {
+        InputStreamReader input = new InputStreamReader(System.in);
+        BufferedReader reader = new BufferedReader(input);
+        for (;;) {
+            System.out.print("> ");
+            String line = reader.readLine();
+            if (line == null) {
+                break;
+            } else if (line.equals("exit")) {
+                System.exit(64);
+            }
+            run(line);
+            hadError = false;
+        }
     }
-  }
 
-  private static void run(String src) {
-    Scanner scanner = new Scanner(src);
-    List<Token> tokens = scanner.scanTokens();
-    Parser parser = new Parser(tokens);
-    Expr expression = parser.parse();
-    if (expression == null) {
-      System.out.println("Expression is null");
-      return;
+    private static void run(String src) {
+        Scanner scanner = new Scanner(src);
+        List<Token> tokens = scanner.scanTokens();
+        Parser parser = new Parser(tokens);
+        List<Stmt> statements = parser.parse();
+        // if (expression == null) {
+        // System.out.println("Expression is null");
+        // return;
+        // }
+        if (hadError)
+            return;
+        // System.out.println(new AstPrinter().print(expression));
+        interpreter.interpret(statements);
     }
-    if (hadError) return;
-    System.out.println(new AstPrinter().print(expression));
-  }
 
-  static void error(int line, String message) {
-    report(line, "", message);
-  }
-
-  static void report(int line, String where, String message) {
-    System.err.println("[line " + line + " ] Error" + where + ": " + message);
-    hadError = true;
-  }
-
-  static void error(Token token, String message) {
-    if (token.type == EOF) {
-      report(token.line, " at end", message);
-    } else {
-      report(token.line, " at '" + token.lexeme + "'", message);
+    static void error(int line, String message) {
+        report(line, "", message);
     }
-  }
+
+    static void report(int line, String where, String message) {
+        System.err.println(
+                "[line " + line + "] Error" + where + ": " + message);
+        hadError = true;
+    }
+
+    static void error(Token token, String message) {
+        if (token.type == EOF) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
+    }
+
+    static void runtimeError(RuntimeError error) {
+        System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
+    }
 }

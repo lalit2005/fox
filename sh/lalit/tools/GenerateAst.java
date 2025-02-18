@@ -12,14 +12,26 @@ public class GenerateAst {
             System.exit(64);
         }
         String outDir = args[0];
-        defineAst(outDir, "Expr", Arrays.asList(
-                "Binary : Expr left, Token operator, Expr right",
-                "Grouping : Expr expression",
-                "Literal : Object value",
-                "Unary : Token operator, Expr right"));
+        defineAst(
+                outDir,
+                "Expr",
+                Arrays.asList(
+                        "Assign   : Token name, Expr value",
+                        "Binary   : Expr left, Token operator, Expr right",
+                        "Grouping : Expr expression",
+                        "Literal  : Object value",
+                        "Unary    : Token operator, Expr right",
+                        "Variable : Token name"));
+
+        defineAst(outDir, "Stmt", Arrays.asList(
+                "Block      : List<Stmt> statements",
+                "Expression : Expr expression",
+                "Print      : Expr expression",
+                "Var        : Token name, Expr initializer"));
     }
 
-    private static void defineAst(String outDir, String baseName, List<String> types) throws IOException {
+    private static void defineAst(String outDir, String baseName, List<String> types)
+            throws IOException {
         String path = outDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, "UTF-8");
         writer.println("package sh.lalit.fox;");
@@ -27,6 +39,7 @@ public class GenerateAst {
         writer.println("import java.util.List;");
         writer.println();
         writer.println("abstract class " + baseName + " {");
+        writer.println();
         defineVisitor(writer, baseName, types);
         for (String type : types) {
             String className = type.split(":")[0].trim();
@@ -37,16 +50,16 @@ public class GenerateAst {
         writer.println("  abstract <R> R accept(Visitor<R> visitor);");
         writer.println("}");
         writer.close();
-
     }
 
-    private static void defineType(PrintWriter writer, String baseName, String className, String fieldList) {
+    private static void defineType(
+            PrintWriter writer, String baseName, String className, String fieldList) {
         writer.println("  static class " + className + " extends " + baseName + " {");
         writer.println("    " + className + "(" + fieldList + ") {"); // constructor
         String fields[] = fieldList.split(",");
         for (String field : fields) {
             String name = field.trim().split(" ")[1];
-            writer.println("this." + name + " = " + name + ";");
+            writer.println("      this." + name + " = " + name + ";");
         }
         writer.println("    }");
         writer.println();
@@ -64,7 +77,15 @@ public class GenerateAst {
         writer.println("  interface Visitor<R> {");
         for (String type : types) {
             String typeName = type.split(":")[0].trim();
-            writer.println("    R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
+            writer.println(
+                    "    R visit"
+                            + typeName
+                            + baseName
+                            + "("
+                            + typeName
+                            + " "
+                            + baseName.toLowerCase()
+                            + ");");
         }
         writer.println("  }");
     }

@@ -1,17 +1,18 @@
 package sh.lalit.fox;
 
+import static sh.lalit.fox.TokenType.*;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
-
-import static sh.lalit.fox.TokenType.*;
 
 public class Scanner {
     private final String source;
     private final List<Token> tokens = new ArrayList<Token>();
     private int start;
-    private int current; // the cursor. "abcd" => if the current is at b, advance returns b and goes to c
+    private int current; // the cursor. "abcd" => if the current is at b, advance returns b and goes to
+                         // current goes to c
     private int line;
     private static final Map<String, TokenType> keywords;
 

@@ -1,3 +1,3 @@
-# Fox - A Toy Programming Language
+### fox
 
-Fox is a toy programming language implemented as part of the "Crafting Interpreters" book by Robert Nystrom. This project is a Java-based implementation of the Lox language described in the book.
+fox is a toy programming language that i'm developing for fun. fox is the same as jlox interpreter from the book crafting interpreters by bob nystrom.

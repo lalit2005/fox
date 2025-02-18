@@ -2,28 +2,100 @@ package sh.lalit.fox;
 
 import static sh.lalit.fox.TokenType.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Parser {
-    private static class ParseError extends RuntimeException {}
+
+    private static class ParseError extends RuntimeException {
+    }
 
     private final List<Token> tokens;
-    private int current = 0;
+    private int current = 0; // points to the next token waiting eagerly to be parsed
 
     public Parser(List<Token> tokens) {
         this.tokens = tokens;
     }
 
-    public Expr parse() {
+    public List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(declaration());
+        }
+        return statements;
+    }
+
+    private Expr expression() {
+        return assignment();
+    }
+
+    private Stmt declaration() {
         try {
-            return expression();
+            if (match(VAR))
+                return varDeclaration();
+            return statement();
         } catch (ParseError error) {
+            synchronize();
             return null;
         }
     }
 
-    private Expr expression() {
-        return equality();
+    private Stmt statement() {
+        if (match(PRINT))
+            return printStatement();
+        if (match(LEFT_BRACE)) {
+            return new Stmt.Block(block());
+        }
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expected ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expected variable name.");
+        Expr initializer = null;
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+        consume(SEMICOLON, "Expected ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expected ';' after expression.");
+        return new Stmt.Print(expr);
+    }
+
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        // if there's an right_brace missing, report the line
+        // where return stmt is present instead of the eof
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+        consume(RIGHT_BRACE, "Expected '}' after block.");
+        return statements;
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+        if (match(EQUAL)) {
+            Token equals = previous();
+            Expr value = assignment();
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable) expr).name;
+                return new Expr.Assign(name, value);
+            }
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
 
     private Expr equality() {
@@ -90,9 +162,18 @@ public class Parser {
             consume(RIGHT_PAREN, "Expected ')' after expression.");
             return new Expr.Grouping(expr);
         }
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
+        }
+        // as every expression parsing starts from equality and comes down
+        // to primary, when this statement is reached, it means that all
+        // the checks have failed and this is an invalid token
+        // in the place of an expression
         throw error(peek(), "Expected expression.");
     }
 
+    // only if the one of the expected token matches with the next token,
+    // the token is consumed and true is returned, else false is returned
     private boolean match(TokenType... types) {
         for (TokenType type : types) {
             if (check(type)) {
@@ -103,12 +184,14 @@ public class Parser {
         return false;
     }
 
+    // the token has to match else it's an error. eg. a semicolon, left paren, etc..
     private Token consume(TokenType type, String message) {
         if (check(type))
             return advance();
         throw error(peek(), message);
     }
 
+    // check the next token
     private boolean check(TokenType type) {
         if (isAtEnd())
             return false;
@@ -153,10 +236,7 @@ public class Parser {
                 case WHILE:
                 case PRINT:
                 case RETURN:
-                    break;
-
-                default:
-                    break;
+                    return;
             }
             advance();
         }

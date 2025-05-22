@@ -18,16 +18,27 @@ public class GenerateAst {
                 Arrays.asList(
                         "Assign   : Token name, Expr value",
                         "Binary   : Expr left, Token operator, Expr right",
+                        "Call     : Expr callee, Token paren, List<Expr> arguments",
+                        "Get      : Expr object, Token name",
+                        "Set      : Expr object, Token name, Expr value", // name is the field name in the instance
+                        "Super    : Token keyword, Token method",
+                        "This     : Token keyword",
                         "Grouping : Expr expression",
                         "Literal  : Object value",
+                        "Logical  : Expr left, Token operator, Expr right",
                         "Unary    : Token operator, Expr right",
                         "Variable : Token name"));
 
         defineAst(outDir, "Stmt", Arrays.asList(
                 "Block      : List<Stmt> statements",
+                "Class      : Token name, Expr.Variable superclass, List<Stmt.Function> methods",
                 "Expression : Expr expression",
+                "Function   : Token name, List<Token> params, List<Stmt> body",
+                "If         : Expr condition, Stmt thenBranch, Stmt elseBranch",
                 "Print      : Expr expression",
-                "Var        : Token name, Expr initializer"));
+                "Return     : Token keyword, Expr value", // storing the keyword `return` to report errors later
+                "Var        : Token name, Expr initializer",
+                "While      : Expr condition, Stmt body"));
     }
 
     private static void defineAst(String outDir, String baseName, List<String> types)

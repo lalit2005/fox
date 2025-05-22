@@ -1,19 +1,35 @@
-var a = "global a";
-var b = "global b";
-var c = "global c";
-{
-    var a = "outer a";
-    var b = "outer b";
-    {
-        var a = "inner a";
-        print a;
-        print b;
-        print c;
-    }
-    print a;
-    print b;
-    print c;
+class Scheduler {
+  init() {
+    this.task = nil;
+  }
+
+  scheduleTask(task) {
+    this.task = task;
+    print("Task scheduled: " + task);
+  }
 }
-print a;
-print b;
-print c;
+
+class PriorityScheduler < Scheduler {
+  init() {
+    super.init();
+    this.highPriorityTask = nil;
+  }
+
+  prioritySchedule(task, isHighPriority) {
+    if (isHighPriority) {
+      this.highPriorityTask = task;
+      print("High priority task scheduled: " + task);
+    } else {
+      this.scheduleTask(task);
+    }
+  }
+}
+
+var scheduler = Scheduler();
+scheduler.init();
+scheduler.scheduleTask("Regular Task");
+
+var priorityScheduler = PriorityScheduler();
+priorityScheduler.init();
+priorityScheduler.prioritySchedule("Important Task", true);
+priorityScheduler.prioritySchedule("Regular Task", true);

@@ -2,7 +2,7 @@ compile:
 	javac sh/lalit/fox/Fox.java
 
 run:
-	javac sh/lalit/fox/Fox.java && java sh.lalit.fox.Fox
+	rm -rf sh/lalit/fox/*.class && javac sh/lalit/fox/Fox.java && java sh.lalit.fox.Fox test.fox
 
 clean:
 	rm -rf sh/lalit/fox/*.class
